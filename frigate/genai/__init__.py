@@ -300,6 +300,14 @@ Rules for the report:
         logger.debug(f"Sending images to genai provider with prompt: {prompt}")
         return self._send(prompt, images)
 
+    def embed_texts(self, texts: list[str]) -> Optional[list[list[float]]]:
+        """Get embeddings for a list of texts."""
+        return None
+
+    def embed_images(self, images: list[bytes]) -> Optional[list[list[float]]]:
+        """Get embeddings for a list of images."""
+        return None
+
     def _init_provider(self):
         """Initialize the client."""
         return None

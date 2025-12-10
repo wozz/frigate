@@ -68,6 +68,43 @@ class OpenAIClient(GenAIClient):
             logger.warning("OpenAI returned an error: %s", str(e))
             return None
 
+    def embed_texts(self, texts: list[str]) -> Optional[list[list[float]]]:
+        """Get embeddings for a list of texts."""
+        try:
+            result = self.provider.embeddings.create(
+                model=self.genai_config.embedding_model,
+                input=texts,
+                timeout=self.timeout,
+            )
+            if (
+                result is not None
+                and hasattr(result, "data")
+                and len(result.data) > 0
+            ):
+                return [embedding.embedding for embedding in result.data]
+            return None
+        except (TimeoutException, Exception) as e:
+            logger.warning("OpenAI returned an error: %s", str(e))
+            return None
+
+    def embed_images(self, images: list[bytes]) -> Optional[list[list[float]]]:
+        """Get embeddings for a list of images."""
+        descriptions = []
+        for image in images:
+            description = self.generate_image_description(
+                prompt=self.genai_config.vision_model_prompt,
+                images=[image],
+            )
+            if description:
+                descriptions.append(description)
+            else:
+                descriptions.append("")
+
+        if not descriptions:
+            return None
+
+        return self.embed_texts(descriptions)
+
     def get_context_size(self) -> int:
         """Get the context window size for OpenAI."""
         if self.context_size is not None:

@@ -72,6 +72,44 @@ class OllamaClient(GenAIClient):
             logger.warning("Ollama returned an error: %s", str(e))
             return None
 
+    def embed_texts(self, texts: list[str]) -> Optional[list[list[float]]]:
+        """Get embeddings for a list of texts."""
+        if self.provider is None:
+            logger.warning(
+                "Ollama provider has not been initialized, embeddings will not be generated. Check your Ollama configuration."
+            )
+            return None
+        try:
+            embeddings = []
+            for text in texts:
+                result = self.provider.embeddings(
+                    model=self.genai_config.embedding_model,
+                    prompt=text,
+                )
+                embeddings.append(result["embedding"])
+            return embeddings
+        except (TimeoutException, ResponseError, ConnectionError) as e:
+            logger.warning("Ollama returned an error: %s", str(e))
+            return None
+
+    def embed_images(self, images: list[bytes]) -> Optional[list[list[float]]]:
+        """Get embeddings for a list of images."""
+        descriptions = []
+        for image in images:
+            description = self.generate_image_description(
+                prompt=self.genai_config.vision_model_prompt,
+                images=[image],
+            )
+            if description:
+                descriptions.append(description)
+            else:
+                descriptions.append("")
+
+        if not descriptions:
+            return None
+
+        return self.embed_texts(descriptions)
+
     def get_context_size(self) -> int:
         """Get the context window size for Ollama."""
         return self.genai_config.provider_options.get("options", {}).get(

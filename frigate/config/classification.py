@@ -116,26 +116,7 @@ class CustomClassificationConfig(FrigateBaseModel):
 
 class SemanticSearchProviderEnum(str, Enum):
     local = "local"
-    openai = "openai"
-    ollama = "ollama"
-
-
-class RemoteSemanticSearchConfig(FrigateBaseModel):
-    """Config for remote semantic search providers."""
-
-    api_key: Optional[str] = Field(
-        default=None, title="API key for the remote embedding provider."
-    )
-    model: Optional[str] = Field(
-        default=None, title="The embedding model to use for semantic search."
-    )
-    url: Optional[str] = Field(
-        default=None, title="URL for the remote embedding provider."
-    )
-    vision_model_prompt: Optional[str] = Field(
-        default="A detailed description of the image for semantic search.",
-        title="Prompt for the vision model to describe the image for embedding. This uses the configured GenAI provider.",
-    )
+    genai = "genai"
 
 
 class ClassificationConfig(FrigateBaseModel):
@@ -169,10 +150,6 @@ class SemanticSearchConfig(FrigateBaseModel):
         default=None,
         title="The device key to use for semantic search.",
         description="This is an override, to target a specific device. See https://onnxruntime.ai/docs/execution-providers/ for more information",
-    )
-    remote: RemoteSemanticSearchConfig = Field(
-        default_factory=RemoteSemanticSearchConfig,
-        title="Remote semantic search provider config.",
     )
 
 

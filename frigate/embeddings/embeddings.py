@@ -25,7 +25,7 @@ from frigate.const import (
 )
 from frigate.data_processing.types import DataProcessorMetrics
 from frigate.db.sqlitevecq import SqliteVecQueueDatabase
-from frigate.embeddings.remote import get_embedding_client
+from frigate.genai import get_genai_client
 from frigate.models import Event, Trigger
 from frigate.types import ModelStatusTypesEnum
 from frigate.util.builtin import EventsPerSecond, InferenceSpeed, serialize
@@ -135,9 +135,9 @@ class Embeddings:
                     or ("GPU" if config.semantic_search.local_model_size == "large" else "CPU"),
                 )
         else:
-            self.remote_embedding_client = get_embedding_client(self.config)
-            self.text_embedding = self.remote_embedding_client.embed_texts
-            self.vision_embedding = self.remote_embedding_client.embed_images
+            self.genai_client = get_genai_client(self.config)
+            self.text_embedding = self.genai_client.embed_texts
+            self.vision_embedding = self.genai_client.embed_images
 
     def update_stats(self) -> None:
         self.metrics.image_embeddings_eps.value = self.image_eps.eps()
