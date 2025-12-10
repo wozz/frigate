@@ -613,6 +613,9 @@ semantic_search:
   enabled: False
   # Optional: Re-index embeddings database from historical tracked objects (default: shown below)
   reindex: False
+  # Optional: The semantic search provider to use. (default: shown below)
+  # NOTE: local or genai
+  provider: local
   # Optional: Set the model used for embeddings. (default: shown below)
   model: "jinav1"
   # Optional: Set the model size used for embeddings. (default: shown below)

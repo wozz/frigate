@@ -50,8 +50,8 @@ Differently weighted versions of the Jina models are available and can be select
 ```yaml
 semantic_search:
   enabled: True
-  local_model: "jinav1"
-  local_model_size: small
+  model: "jinav1"
+  model_size: small
 ```
 
 - Configuring the `large` model employs the full Jina model and will automatically run on the GPU if applicable.
@@ -68,8 +68,8 @@ To use the V2 model, update the `model` parameter in your config:
 ```yaml
 semantic_search:
   enabled: True
-  local_model: "jinav2"
-  local_model_size: large
+  model: "jinav2"
+  model_size: large
 ```
 
 For most users, especially native English speakers, the V1 model remains the recommended choice.
@@ -80,23 +80,27 @@ Switching between V1 and V2 requires reindexing your embeddings. The embeddings 
 
 :::
 
-### Remote Providers
+### GenAI Providers
 
-Frigate can be configured to use remote services for generating embeddings. This is done by setting the `provider` field to `openai` or `ollama`.
+Frigate can be configured to use your configured [GenAI](/configuration/genai) provider for generating embeddings. This is done by setting the `provider` field to `genai`.
 
-For vision embeddings, remote providers use a two-step process:
+For vision embeddings, GenAI providers use a two-step process:
 1. A text description of the image is generated using the configured GenAI provider.
-2. An embedding is created from that description using the configured remote embedding provider.
+2. An embedding is created from that description using the configured embedding model.
 
-This means that you must have a GenAI provider configured to use vision embeddings with a remote provider.
+This means that you must have a GenAI provider configured to use GenAI embeddings.
 
 ```yaml
+genai:
+  provider: openai
+  api_key: "sk-..."
+  model: gpt-4o
+  embedding_model: "text-embedding-3-small"
+  vision_model_prompt: "A detailed description of the image for semantic search."
+
 semantic_search:
   enabled: True
-  provider: openai
-  remote:
-    model: "text-embedding-3-small"
-    vision_model_prompt: "A detailed description of the image for semantic search."
+  provider: genai
 ```
 
 ### GPU Acceleration
@@ -106,7 +110,7 @@ The CLIP models are downloaded in ONNX format, and the `large` model can be acce
 ```yaml
 semantic_search:
   enabled: True
-  local_model_size: large
+  model_size: large
   # Optional, if using the 'large' model in a multi-GPU installation
   device: 0
 ```
@@ -176,7 +180,7 @@ When a trigger fires, the UI highlights the trigger with a blue dot for 3 second
 
 ### Notes
 
-- Triggers rely on the same Jina AI CLIP models (V1 or V2) used for semantic search. Ensure `semantic_search` is enabled and properly configured.
+- Triggers rely on the configured semantic search provider (Local Jina AI or GenAI). Ensure `semantic_search` is enabled and properly configured.
 - Reindexing embeddings (via the UI or `reindex: True`) does not affect trigger configurations but may update the embeddings used for matching.
 - For optimal performance, use a system with sufficient RAM (8GB minimum, 16GB recommended) and a GPU for `large` model configurations, as described in the Semantic Search requirements.
 
